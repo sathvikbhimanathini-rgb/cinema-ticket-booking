@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KLH Cinema – Ticket Booking</title>
+<style>
+:root{--bg:#e9f1fb;--surf:#fff;--ink:#14284b;--mute:#5b6b86;--navy:#14284b;--yel:#f6c026;--red:#d7263d;--free:#2b9a7f;--taken:#b9c3d4;--line:#c9d6ea;--err:#c0192d;--onnavy:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1626;--surf:#18243b;--ink:#eef3fb;--mute:#9aa9c3;--navy:#223a66;--taken:#46557a;--line:#2c3c5e;--err:#ff8a98}}
+:root[data-theme="dark"]{--bg:#0e1626}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 'Trebuchet MS',Verdana,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 56px}
+header{background:var(--navy);color:var(--onnavy);border-radius:14px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-weight:900;font-size:2rem;letter-spacing:.04em;line-height:1}
+.logo b:nth-child(1){color:#ff4a5c}.logo b:nth-child(2){color:#5fb0ff}.logo b:nth-child(3){color:var(--yel)}
+.logo small{display:block;font-size:.7rem;letter-spacing:.12em;font-weight:600;color:#cfdcf2;margin-top:4px}
+.tag{background:var(--yel);color:#14284b;font-weight:800;padding:6px 14px;border-radius:20px;font-size:.9rem}
+.steps{display:flex;gap:8px;margin:18px 0}
+.steps div{flex:1;text-align:center;padding:8px 2px;border-radius:20px;background:var(--surf);border:2px solid var(--line);font-size:.8rem;color:var(--mute);font-weight:700}
+.steps .on{background:var(--yel);border-color:var(--yel);color:#14284b}
+.steps .done{background:var(--free);border-color:var(--free);color:#fff}
+.card{background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:20px}
+h2{font-size:1.3rem;margin:0 0 14px}
+label{display:block;margin:12px 0 6px;color:var(--mute);font-size:.9rem;font-weight:700}
+input[type=text],input[type=number]{width:100%;padding:12px;font:inherit;background:var(--bg);color:var(--ink);border:2px solid var(--line);border-radius:10px}
+button{font:inherit;cursor:pointer;border-radius:10px;padding:12px 22px;border:2px solid var(--navy);background:var(--navy);color:#fff;font-weight:800}
+button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+button.go{background:var(--yel);border-color:var(--yel);color:#14284b}
+button:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.err{color:var(--err);min-height:1.4em;margin:10px 0 0;font-weight:700}
+.movies{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.movie{padding:0;overflow:hidden;text-align:left;background:var(--surf);color:var(--ink);border:3px solid var(--line);border-radius:14px}
+.movie.sel{border-color:var(--red)}
+.poster{height:110px;display:flex;align-items:flex-end;padding:10px;font-size:2rem}
+.mi{padding:10px 12px}.mi b{display:block}.mi span{color:var(--mute);font-size:.85rem}.mi em{font-style:normal;font-weight:800;color:var(--red)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:8px 14px;border-radius:20px;border:2px solid var(--line);background:var(--surf);color:var(--ink);font-weight:700}
+.chip.sel{background:var(--navy);border-color:var(--navy);color:#fff}
+.screen{height:10px;background:linear-gradient(90deg,var(--red),var(--yel));border-radius:50% 50% 0 0;margin:14px 12% 4px}
+.cap{text-align:center;color:var(--mute);font-size:.8rem;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:auto repeat(5,1fr);gap:8px;max-width:400px;margin:0 auto;align-items:center}
+.lab{color:var(--mute);font-size:.8rem;text-align:center;font-weight:700}
+.seat{aspect-ratio:1;border-radius:10px 10px 4px 4px;border:0;background:var(--free);color:#fff;padding:0}
+.seat.taken{background:var(--taken);cursor:not-allowed;color:var(--navy)}
+.seat.pick{background:var(--yel);color:#14284b}
+.legend{display:flex;gap:16px;justify-content:center;margin-top:14px;font-size:.85rem;color:var(--mute)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px}
+.bar{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px;color:var(--mute);font-size:.9rem;flex-wrap:wrap}
+.ticket{display:grid;grid-template-columns:1fr auto;background:var(--surf);border:2px solid var(--navy);border-radius:14px;overflow:hidden}
+.tl{padding:18px}.tl dl{display:grid;grid-template-columns:90px 1fr;gap:6px;margin:0}.tl dt{color:var(--mute)}.tl dd{margin:0;font-weight:700}
+.tr{background:var(--navy);color:#fff;padding:18px 14px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;border-left:3px dashed var(--yel);min-width:110px}
+.bc{width:80px;height:46px;background:repeating-linear-gradient(90deg,#fff 0 2px,transparent 2px 4px,#fff 4px 5px,transparent 5px 8px)}
+.total{font-size:1.4rem;color:var(--red);font-weight:900}
+.cpn{display:flex;gap:8px;margin-top:12px}.cpn input{flex:1}
+.hide{display:none}
+.hist{margin-top:14px;font-size:.88rem;color:var(--mute)}
+footer{margin-top:24px;text-align:center;color:var(--mute);font-size:.8rem}
+@media (max-width:480px){.ticket{grid-template-columns:1fr}.tr{border-left:0;border-top:3px dashed var(--yel);flex-direction:row}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="logo"><b>K</b><b>L</b><b>H</b><small>CINEMA · BACHUPALLY</small></div><span class="tag">Ticket booking</span><button id="adm" style="background:transparent;color:#fff;border-color:#cfdcf2;padding:8px 16px">Admin view</button></header>
+<nav class="steps" id="steps"><div>Details</div><div>Movie</div><div>Seats</div><div>Bill</div></nav>
+
+<section id="s0" class="card">
+<h2>Who is booking?</h2>
+<label for="name">Customer name</label>
+<input type="text" id="name" autocomplete="name" placeholder="e.g. Naga Bhavesh">
+<div class="err" id="e0" role="alert"></div>
+<div class="row"><button class="go" id="n0">Continue</button></div>
+</section>
+
+<section id="s1" class="card hide">
+<h2>Pick a movie and show</h2>
+<div class="movies" id="movies"></div>
+<label>Showtime</label><div class="chips" id="times"></div>
+<label for="tk">Number of tickets (1–15)</label>
+<input type="number" id="tk" min="1" max="15" value="2">
+<div class="err" id="e1" role="alert"></div>
+<div class="row"><button class="ghost" data-go="0">Back</button><button class="go" id="n1">Choose seats</button></div>
+</section>
+
+<section id="s2" class="card hide">
+<h2 id="h2s"></h2>
+<div class="bar"><span id="cnt"></span><span id="sub"></span></div>
+<div class="screen"></div><div class="cap">Screen this way</div>
+<div class="grid" id="grid"></div>
+<div class="legend"><span><i style="background:var(--free)"></i>Free</span><span><i style="background:var(--yel)"></i>Yours</span><span><i style="background:var(--taken)"></i>Booked</span></div>
+<div class="err" id="e2" role="alert"></div>
+<div class="row"><button class="ghost" data-go="1">Back</button><button class="go" id="n2">See bill</button></div>
+</section>
+
+<section id="s3" class="card hide">
+<h2>Review your booking</h2>
+<div id="bill"></div>
+<label for="cp">Coupon code (try KLH50)</label>
+<div class="cpn"><input type="text" id="cp" placeholder="Optional"><button class="ghost" id="ap">Apply</button></div>
+<div class="err" id="e3" role="alert"></div>
+<div class="row"><button class="ghost" data-go="2">Back</button><button class="go" id="yes">Confirm booking</button><button class="ghost" id="no">Cancel</button></div>
+</section>
+
+<section id="s4" class="card hide">
+<h2 id="doneT"></h2>
+<div id="final"></div>
+<div class="row"><button class="go" id="again">New booking</button><button class="ghost" id="dl" hidden>Download ticket (PDF)</button></div>
+</section>
+
+<section id="s5" class="card hide"><div id="admin"></div><div class="row"><button class="go" id="back5">Back to booking</button></div></section>
+<div class="hist" id="hist"></div>
+<footer>Capstone prototype · Java: methods, abstraction, interfaces, collections</footer>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const ROWS=3,COLS=5;
+const movies=[
+ {n:"RomCom",p:200,g:"Romance · 2h 05m",c:"linear-gradient(135deg,#ff7aa2,#d7263d)",e:"💕"},
+ {n:"Action",p:250,g:"Action · 2h 20m",c:"linear-gradient(135deg,#14284b,#4a6fd0)",e:"💥"},
+ {n:"Comedy",p:180,g:"Comedy · 1h 55m",c:"linear-gradient(135deg,#f6c026,#ff9a3c)",e:"😂"}];
+const times=["10:30 AM","2:00 PM","6:30 PM","9:30 PM"];
+const maps={};
+const getMap=()=>maps[st.movie+"|"+st.time]??=Array.from({length:ROWS},()=>Array(COLS).fill(false));
+const customers=new Set(),history=[],bookings=[];let last,cur=0;
+let st={movie:0,time:1};
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function show(i){
+ if(i!==5)cur=i;
+ for(let k=0;k<6;k++)$("s"+k).classList.toggle("hide",k!==i);
+ [...$("steps").children].forEach((d,k)=>d.className=k<i?"done":k===i?"on":"");
+ if(i===1)drawMovies();if(i===2)drawSeats();if(i===3)drawBill();if(i===5)drawAdmin();
+ window.scrollTo(0,0);
+}
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>show(+b.dataset.go));
+$("n0").onclick=()=>{
+ const v=$("name").value.trim();
+ if(!v){$("e0").textContent="Name cannot be empty. Enter the customer's name.";return}
+ $("e0").textContent="";st.customer=v;st.pick=[];show(1);
+};
+function drawMovies(){
+ $("movies").innerHTML="";
+ movies.forEach((m,i)=>{
+  const b=document.createElement("button");
+  b.className="movie"+(st.movie===i?" sel":"");
+  b.innerHTML=`<div class="poster" style="background:${m.c}">${m.e}</div><div class="mi"><b>${i+1}. ${m.n}</b><span>${m.g}</span><br><em>Rs.${m.p}</em></div>`;
+  b.onclick=()=>{st.movie=i;st.pick=[];drawMovies()};
+  $("movies").appendChild(b);
+ });
+ $("times").innerHTML="";
+ times.forEach((t,i)=>{
+  const b=document.createElement("button");
+  b.className="chip"+(st.time===i?" sel":"");b.textContent=t;
+  b.onclick=()=>{st.time=i;st.pick=[];drawMovies()};
+  $("times").appendChild(b);
+ });
+}
+$("n1").onclick=()=>{
+ const t=parseInt($("tk").value,10);
+ if(!(t>=1&&t<=ROWS*COLS)){$("e1").textContent="Invalid ticket count. Enter a number from 1 to 15.";return}
+ $("e1").textContent="";
+ if(st.tickets!==t)st.pick=[];
+ st.tickets=t;show(2);
+};
+function drawSeats(){
+ const m=movies[st.movie],map=getMap();
+ $("h2s").textContent=`Select ${st.tickets} seat(s)`;
+ $("sub").textContent=`${m.n} · ${times[st.time]}`;
+ $("cnt").textContent=`${st.pick.length} of ${st.tickets} chosen`;
+ const g=$("grid");g.innerHTML="<span></span>";
+ for(let c=0;c<COLS;c++)g.insertAdjacentHTML("beforeend",`<span class="lab">${c+1}</span>`);
+ for(let r=0;r<ROWS;r++){
+  g.insertAdjacentHTML("beforeend",`<span class="lab">Row ${r+1}</span>`);
+  for(let c=0;c<COLS;c++){
+   const k=r+"-"+c,taken=map[r][c],picked=st.pick.includes(k);
+   const b=document.createElement("button");
+   b.className="seat"+(taken?" taken":"")+(picked?" pick":"");
+   b.textContent=taken?"X":"";
+   b.setAttribute("aria-label",`Row ${r+1} seat ${c+1}, ${taken?"booked":picked?"selected":"free"}`);
+   b.onclick=()=>{
+    if(taken){$("e2").textContent="Already booked! Choose a free seat.";return}
+    $("e2").textContent="";
+    if(picked)st.pick=st.pick.filter(x=>x!==k);
+    else if(st.pick.length<st.tickets)st.pick.push(k);
+    else $("e2").textContent=`All ${st.tickets} seats chosen. Tap a yellow seat to release it.`;
+    drawSeats();
+   };
+   g.appendChild(b);
+  }
+ }
+}
+$("n2").onclick=()=>{
+ if(st.pick.length<st.tickets){$("e2").textContent=`Choose ${st.tickets-st.pick.length} more seat(s).`;return}
+ $("e2").textContent="";st.disc=0;$("cp").value="";show(3);
+};
+const lab=k=>{const[r,c]=k.split("-");return `R${+r+1}-S${+c+1}`};
+// Method overloading: calculatePrice(t,p) and calculatePrice(t,p,d)
+const calcPrice=(t,p,d)=>d===undefined?t*p:t*p-d;
+const total=()=>st.disc?calcPrice(st.tickets,movies[st.movie].p,st.disc):calcPrice(st.tickets,movies[st.movie].p);
+function rows(tot){
+ const m=movies[st.movie];
+ return `<dl><dt>Customer</dt><dd>${esc(st.customer)}</dd><dt>Movie</dt><dd>${m.n}, ${times[st.time]}</dd><dt>Tickets</dt><dd>${st.tickets} × Rs.${m.p}</dd><dt>Seats</dt><dd>${st.pick.map(lab).join(", ")}</dd>${st.disc?`<dt>Discount</dt><dd>− Rs.${st.disc}</dd>`:""}<dt>Total</dt><dd class="total">Rs.${tot}</dd></dl>`;
+}
+function drawBill(){$("bill").innerHTML=`<div class="ticket"><div class="tl">${rows(total())}</div><div class="tr"><span>🎟️</span><span>KLH</span></div></div>`}
+$("ap").onclick=()=>{
+ const v=$("cp").value.trim().toUpperCase();
+ if(v==="KLH50"){st.disc=50;$("e3").textContent="";}
+ else{st.disc=0;$("e3").textContent=v?"Coupon not valid. Check the code and try again.":"";}
+ drawBill();
+};
+$("yes").onclick=()=>{
+ const tot=total();
+ if(st.tickets<=0){$("e3").textContent="Invalid tickets!";return}
+ const map=getMap();
+ st.pick.forEach(k=>{const[r,c]=k.split("-");map[r][c]=true});
+ customers.add(st.customer);
+ const id="KLH"+String(history.length+1).padStart(3,"0");
+ history.push(`${id} · ${st.customer} · ${movies[st.movie].n} ${times[st.time]} · Rs.${tot}`);
+ last={id,customer:st.customer,movie:movies[st.movie].n,time:times[st.time],tickets:st.tickets,seats:st.pick.map(lab).join(", "),total:tot};bookings.push(last);$("dl").hidden=false;
+ $("doneT").textContent="Booking confirmed!";
+ $("final").innerHTML=`<div class="ticket"><div class="tl">${rows(tot)}</div><div class="tr"><div class="bc"></div><span>${id}</span></div></div>`;
+ $("hist").innerHTML="<b>Bookings this session</b><br>"+history.map(esc).join("<br>")+`<br>Unique customers: [${[...customers].map(esc).join(", ")}]`;
+ const m=movies[st.movie];
+ show(4);
+};
+$("no").onclick=()=>{
+ $("dl").hidden=true;$("doneT").textContent="Booking cancelled.";
+ $("final").innerHTML="<p>No seats were held. Start a new booking whenever you're ready.</p>";
+ show(4);
+};
+$("again").onclick=()=>{st={movie:0,time:1};$("name").value="";$("tk").value=2;show(0)};
+function drawAdmin(){
+ const rev=bookings.reduce((a,b)=>a+b.total,0);
+ let h=`<h2>Admin view</h2><p>${bookings.length} booking(s) · Rs.${rev} total sales</p><label>Seats filled per show</label>`;
+ movies.forEach((m,mi)=>times.forEach((t,ti)=>{
+  const mp=maps[mi+"|"+ti],n=mp?mp.flat().filter(Boolean).length:0;
+  h+=`<div style="margin:6px 0"><span style="display:inline-block;width:150px">${m.n}, ${t}</span><meter min="0" max="15" value="${n}"></meter> ${n}/15</div>`;
+ }));
+ h+=bookings.length?`<label>All bookings</label><div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;font-size:.88rem"><tr style="text-align:left;color:var(--mute)"><th>ID</th><th>Customer</th><th>Show</th><th>Seats</th><th>Total</th></tr>${bookings.map(b=>`<tr style="border-top:1px solid var(--line)"><td>${b.id}</td><td>${esc(b.customer)}</td><td>${b.movie}, ${b.time}</td><td>${b.seats}</td><td>Rs.${b.total}</td></tr>`).join("")}</table></div>`:"<p>No bookings yet. Confirm a booking and it will appear here.</p>";
+ $("admin").innerHTML=h;
+}
+$("adm").onclick=()=>show($("s5").classList.contains("hide")?5:cur);
+$("back5").onclick=()=>show(cur);
+$("dl").onclick=async()=>{
+ const d=window.claude?await claude.use("downloads"):null;
+ if(!d){$("final").insertAdjacentHTML("beforeend","<p class='err'>Download isn't available in this view. Open the page in claude.ai to save the ticket.</p>");return}
+ const b=last,doc=new window.jspdf.jsPDF({unit:"pt",format:[420,230]});
+ doc.setFillColor(20,40,75);doc.rect(0,0,420,48,"F");
+ doc.setTextColor(246,192,38);doc.setFontSize(20);doc.setFont("helvetica","bold");doc.text("KLH CINEMA",20,31);
+ doc.setTextColor(255,255,255);doc.setFontSize(10);doc.text("E-TICKET "+b.id,400,30,{align:"right"});
+ doc.setTextColor(20,40,75);doc.setFontSize(12);
+ [["Customer",b.customer],["Movie",b.movie+", "+b.time],["Tickets",String(b.tickets)],["Seats",b.seats],["Total","Rs."+b.total]].forEach((r,i)=>{
+  doc.setFont("helvetica","normal");doc.text(r[0],20,80+i*24);doc.setFont("helvetica","bold");doc.text(r[1],110,80+i*24);
+ });
+ for(let x=0;x<120;x+=4)doc.rect(280+x*0.9,150,x%12<6?2:1,50,"F");
+ doc.setFontSize(8);doc.setFont("helvetica","normal");doc.text("Thank you for using KLH Cinema!",20,215);
+ try{await d.save({filename:b.id+"-ticket.pdf",data:doc.output("arraybuffer")})}catch(e){}
+};
+show(0);
+</script>
+</body>
+</html>
