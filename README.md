@@ -75,3 +75,7 @@ java CinemaTicketBookingSystem
 **Project Type:** Academic Capstone Project  
 **Language:** Java  
 **Repository:** Cinema Ticket Booking System
+
+## Live Demo
+
+🌐 [Click here to visit Cinema Ticket Booking](https://sathvikbhimanathini-rgb.github.io/cinema-ticket-booking/)
